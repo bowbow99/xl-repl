@@ -60,7 +60,7 @@
 (defvar *locked-packages* '(:system :lisp :editor :user :repl :repl.command))
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
-(define-key *keymap* #\RET 'newline-or-eval-input)
+(define-key *keymap* #\RET 'eval-input-or-newline)
 (define-key *keymap* #\C-h 'repl-backward-delete-char)
 (define-key *keymap* #\Delete 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-d 'repl-delete-char-or-selection)
@@ -271,6 +271,14 @@
 (defun newline-or-eval-input ()
   (interactive)
   (if (input-complete-p)
+      (eval-input)
+    (lisp-newline-and-indent)))
+
+(defun eval-input-or-newline ()
+  (interactive)
+  (if (save-excursion
+	(goto-eol)
+	(input-complete-p))
       (eval-input)
     (lisp-newline-and-indent)))
 
