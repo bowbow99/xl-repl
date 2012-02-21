@@ -61,6 +61,7 @@
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
 (define-key *keymap* #\RET 'newline-or-eval-input)
+(define-key *keymap* #\LFD 'eval-input)
 (define-key *keymap* #\C-h 'repl-backward-delete-char)
 (define-key *keymap* #\Delete 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-d 'repl-delete-char-or-selection)
@@ -248,21 +249,24 @@
 	      (format t "~A~%~%" (si:*condition-string c))))
 	  (apply #'set-text-attribute start (- (point-max) 2) 'error *error-style*))))))
 
+(defun eval-input ()
+  (interactive)
+  (let ((buf (selected-buffer))
+	(input (get-input)))
+    (if (next-prompt-point)
+	(show-prompt input)
+      (goto-eol))
+    (newline)
+    (eval-and-print input)
+    (if (eq buf (selected-buffer))
+	#0=(show-prompt)
+      (save-excursion (set-buffer buf) #0#))))
+
 (defun newline-or-eval-input ()
   (interactive)
   (if (input-complete-p)
-      (let ((buf (selected-buffer))
-	    (input (get-input)))
-	(if (next-prompt-point)
-	    (show-prompt input)
-	  (goto-eol))
-	(newline)
-	(eval-and-print input)
-	(if (eq buf (selected-buffer))
-	    #0=(show-prompt)
-	  (save-excursion (set-buffer buf) #0#)))
+      (eval-input)
     (lisp-newline-and-indent)))
-
 
 ;;; input history
 (defun save-input-history (input)
