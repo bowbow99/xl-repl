@@ -262,6 +262,13 @@
 	#0=(show-prompt)
       (save-excursion (set-buffer buf) #0#))))
 
+(defun eval-input-if-complete ()
+  (interactive)
+  (when (save-excursion
+	  (goto-eol)
+	  (input-complete-p))
+    (eval-input)))
+
 (defun newline-or-eval-input ()
   (interactive)
   (if (input-complete-p)
