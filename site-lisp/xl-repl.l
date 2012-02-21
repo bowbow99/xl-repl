@@ -178,7 +178,6 @@
 (defun input-complete-p ()
   (save-excursion
     (let ((from (nth-value 1 (previous-prompt-point))))
-      (goto-eol)
       (while (and (>= (point) from)
 		  (ignore-errors (backward-sexp)))
 	(skip-chars-backward " \t\n"))
